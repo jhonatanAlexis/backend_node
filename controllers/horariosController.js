@@ -2,11 +2,9 @@ const asyncHandler = require("express-async-handler")
 const Horario = require("../models/horariosModel")
 
 const getHorario = asyncHandler(async(req, res) =>{
-    const horario = await Horario.find()
-    if(horario.length === 0){
-        res.status(404)
-        throw new Error('No hay horario')
-    }
+    const horario = await Horario.findOne({
+        user: req.user._id
+    })
     res.status(200).json(horario)
 })
 
@@ -16,13 +14,11 @@ const crearHorario = asyncHandler(async(req, res) =>{
         res.status(400)    
         throw new Error("Por favor, ingrese un horario")
     }
-    if(req.body.horario == "Manaña" || req.body.horario == "Noche"){
+    else{
         horario = await Horario.create({
+            user: req.user._id,
             horario: req.body.horario
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un horario valido")
     }
     res.status(201).json(horario)
 })
@@ -34,13 +30,10 @@ const cambiarHorario = asyncHandler(async(req, res) =>{
         res.status(404)
         throw new Error('El horario no existe')
     }
-    if(req.body.horario == "Manaña" || req.body.horario == "Noche"){
+    else{
         horarioActualizado = await Horario.findByIdAndUpdate(req.params.id, req.body, { 
             new: true, 
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un horario valido")
     }
     res.status(200).json(horarioActualizado)
 })

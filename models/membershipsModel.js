@@ -1,6 +1,11 @@
 const mongoose = require("mongoose")
 
 const membershipModel = mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "User"
+    },
     precio: {
         type: Number,
         required: true

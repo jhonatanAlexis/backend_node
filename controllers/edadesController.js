@@ -2,11 +2,9 @@ const asyncHandler = require("express-async-handler")
 const Edad = require("../models/edadesModel")
 
 const getEdad = asyncHandler(async(req, res) =>{
-    const edad = await Edad.find()
-    if(edad.length === 0){
-        res.status(404)
-        throw new Error('No hay edades')
-    }
+    const edad = await Edad.findOne({ //la diferencia entre find y findOne es que fin encuentra todos (array) y findOne encuentra solo uno (object)
+        user: req.user._id
+    })
     res.status(200).json(edad)
 })
 
@@ -16,16 +14,15 @@ const crearEdad = asyncHandler(async(req, res) =>{
         res.status(400)    
         throw new Error("Por favor, ingrese una edad")
     }
-    if(req.body.edad == "30-" || req.body.edad == "31+"){
+    else{
         edad = await Edad.create({
-            edad: req.body.edad
+            user: req.user._id,
+            edad: req.body.edad,
         })
-    }else{
-        res.status(400)    
-        throw new Error("Rango de edad no valido")
     }
     res.status(201).json(edad)
 })
+
 
 const cambiarEdad = asyncHandler(async(req, res) =>{
     let edadActualizada
@@ -34,13 +31,10 @@ const cambiarEdad = asyncHandler(async(req, res) =>{
         res.status(404)
         throw new Error('La edad no existe')
     }
-    if(req.body.edad == "30-" || req.body.edad == "31+"){
+    else{
         edadActualizada = await Edad.findByIdAndUpdate(req.params.id, req.body, { 
             new: true, 
         })
-    }else{
-        res.status(400)    
-        throw new Error("Rango de edad no valido")
     }
     res.status(200).json(edadActualizada)
 })
@@ -59,5 +53,5 @@ module.exports = {
     getEdad,
     crearEdad,
     cambiarEdad,
-    eliminarEdad
+    eliminarEdad,
 }

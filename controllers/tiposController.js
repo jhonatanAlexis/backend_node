@@ -2,11 +2,9 @@ const asyncHandler = require("express-async-handler")
 const Tipo = require("../models/tiposModel")
 
 const getTipo = asyncHandler(async(req, res) =>{
-    const tipo = await Tipo.find()
-    if(tipo.length === 0){
-        res.status(404)
-        throw new Error('No hay tipos')
-    }
+    const tipo = await Tipo.findOne({
+        user: req.user._id
+    })
     res.status(200).json(tipo)
 })
 
@@ -16,13 +14,11 @@ const crearTipo = asyncHandler(async(req, res) =>{
         res.status(400)    
         throw new Error("Por favor, ingrese un tipo")
     }
-    if(req.body.tipo == "Cardio" || req.body.tipo == "Pesas"){
+    else{
         tipo = await Tipo.create({
-            tipo: req.body.tipo
+            tipo: req.body.tipo,
+            user: req.user._id,
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un tipo válido")
     }
     res.status(201).json(tipo)
 })
@@ -34,13 +30,10 @@ const cambiarTipo = asyncHandler(async(req, res) =>{
         res.status(404)
         throw new Error('El tipo no existe')
     }
-    if(req.body.tipo == "Cardio" || req.body.tipo == "Pesas"){
+    else{
         tipoActualizado = await Tipo.findByIdAndUpdate(req.params.id, req.body, { 
             new: true, 
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un tipo válido")
     }
     res.status(200).json(tipoActualizado)
 })

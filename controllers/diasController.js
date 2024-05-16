@@ -2,11 +2,9 @@ const asyncHandler = require("express-async-handler")
 const Dia = require("../models/diasModel")
 
 const getDia = asyncHandler(async(req, res) =>{
-    const dia = await Dia.find()
-    if(dia.length === 0){
-        res.status(404)
-        throw new Error('No hay dias')
-    }
+    const dia = await Dia.findOne({
+        user: req.user._id
+    })
     res.status(200).json(dia)
 })
 
@@ -16,13 +14,11 @@ const crearDia = asyncHandler(async(req, res) =>{
         res.status(400)    
         throw new Error("Por favor, ingrese un dia")
     }
-    if(req.body.dia == "3-4" || req.body.dia == "5-6"){
+    else{
         dia = await Dia.create({
+            user: req.user._id,
             dia: req.body.dia
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un dia valido")
     }
     res.status(201).json(dia)
 })
@@ -34,13 +30,10 @@ const cambiarDia = asyncHandler(async(req, res) =>{
         res.status(404)
         throw new Error('El dia no existe')
     }
-    if(req.body.dia == "3-4" || req.body.dia == "5-6"){
+    else{
         diaActualizado = await Dia.findByIdAndUpdate(req.params.id, req.body, { 
             new: true, 
         })
-    }else{
-        res.status(400)    
-        throw new Error("Por favor, ingrese un dia valido")
     }
     res.status(200).json(diaActualizado)
 })
